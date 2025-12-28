@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Despertar Biológico | Fernanda Moreno</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --surface: #ffffff;
+            --primary: #2563eb;
+            --medical-blue: #0ea5e9; 
+            --danger: #ef4444; 
+            --text: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        h1, h2, h3, .price { font-family: 'Space Grotesk', sans-serif; }
+
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -1;
+            transform: perspective(500px) rotateX(20deg) scale(1.5);
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .section-pad { padding: 80px 0; }
+
+        /* --- HERO --- */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; text-align: center;
+            padding-top: 40px; position: relative; overflow: hidden;
+        }
+
+        .alert-badge {
+            background: rgba(239, 68, 68, 0.1); color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 16px; border-radius: 50px;
+            font-weight: bold; font-size: 0.9rem; margin-bottom: 20px;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+
+        .hero h1 { font-size: 4rem; line-height: 1; margin-bottom: 20px; letter-spacing: -1px; }
+        .hero h1 span { color: var(--primary); }
+
+        /* --- ANIMAÇÃO COM IMAGEM PNG --- */
+        .body-morph-container {
+            position: relative;
+            width: 300px;
+            height: auto;
+            margin: 30px auto;
+        }
+
+        /* Scanner Beam */
+        .med-scanner {
+            position: absolute; top: 0; left: -10%; 
+            width: 120%; height: 3px;
+            background: #fff;
+            box-shadow: 0 0 15px #fff, 0 0 30px var(--medical-blue);
+            z-index: 10;
+            /* Duração da descida do laser: 2.5s */
+            animation: scanBody 2.5s ease-in-out infinite alternate;
+            opacity: 0.8;
+        }
+
+        @keyframes scanBody { 0% { top: 2%; } 100% { top: 98%; } }
+
+        /* A IMAGEM DO CORPO (j1.png) */
+        .body-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            /* Tempo da transição visual: 1.5s */
+            transition: all 1.5s ease-out;
+            
+            /* ESTADO INICIAL: FORÇAR VERMELHO E INCHADO */
+            filter: grayscale(100%) sepia(100%) hue-rotate(-50deg) saturate(500%) drop-shadow(0 0 15px rgba(255, 0, 0, 0.8));
+            transform: scale(1.05); 
+        }
+
+        /* ESTADO CURADO - VOLTA AO ORIGINAL */
+        .body-img.healed {
+            /* Remove todos os filtros, revelando o AZUL original */
+            filter: none; 
+            /* Remove o zoom (desincha) */
+            transform: scale(1); 
+        }
+
+        .status-indicator {
+            font-family: monospace;
+            color: var(--danger);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 40px; 
+            transition: color 0.5s;
+            text-transform: uppercase;
+        }
+
+        /* --- RESTO DO CSS --- */
+        .quiz-box {
+            background: var(--surface); border: 2px solid #e2e8f0;
+            border-radius: 20px; padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto;
+        }
+        .quiz-title { text-align: center; margin-bottom: 30px; font-size: 1.5rem; }
+        
+        .symptom-list { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 30px; 
+        }
+        
+        .symptom-check { display: none; }
+        .symptom-label {
+            background: #f1f5f9; padding: 15px; border-radius: 10px; cursor: pointer;
+            transition: 0.2s; font-weight: 500; display: flex; align-items: center; justify-content: space-between;
+            border: 2px solid transparent;
+        }
+        .symptom-check:checked + .symptom-label { background: rgba(220, 38, 38, 0.1); border-color: var(--danger); color: var(--danger); }
+        .risk-container { background: #e2e8f0; height: 20px; border-radius: 10px; overflow: hidden; position: relative; }
+        .risk-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #fbbf24, var(--danger)); transition: width 0.4s; }
+        .risk-text { text-align: center; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
+
+        .compare-section { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 20px; overflow: hidden; margin-top: 60px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .compare-col { padding: 40px; }
+        .col-bad { background: #fee2e2; color: #991b1b; }
+        .col-good { background: #d1fae5; color: #065f46; }
+        .compare-list li { list-style: none; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+
+        .audio-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); transition: transform 0.2s; }
+        .audio-card.playing { border-left-color: var(--medical-blue); background: #f0f9ff; }
+        .play-btn { width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
+        .waveform { flex: 1; height: 30px; background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiPjxyZWN0IHg9IjAiIHk9IjEwIiB3aWR0aD0iMyIgaGVpZ2h0PSIxMCIgZmlsbD0iI2UzZTNiMyIvPjxyZWN0IHg9IjUiIHk9IjUiIHdpZHRoPSIzIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZTNlM2IzIi8+PHJlY3QgeD0iMTAiIHk9IjE1IiB3aWR0aD0iMyIgaGVpZ2h0PSI1IiBmaWxsPSIjZTNlM2IzIi8+PHJlY3QgeD0iMTUiIHk9IjIiIHdpZHRoPSIzIiBoZWlnaHQ9PSIyNiIgZmlsbD0iI2UzZTNiMyIvPjwvc3ZnPg=='); opacity: 0.5; }
+
+        .offer-card { background: white; border: 2px solid var(--primary); border-radius: 30px; padding: 60px 20px; text-align: center; position: relative; overflow: hidden; margin-top: 50px; }
+        .pulse-ring { position: absolute; top: 50%; left: 50%; width: 200px; height: 200px; background: var(--primary); border-radius: 50%; transform: translate(-50%, -50%); opacity: 0.1; animation: pulseBig 3s infinite; }
+        @keyframes pulseBig { 0% {transform: translate(-50%, -50%) scale(1);} 100% {transform: translate(-50%, -50%) scale(3); opacity: 0;} }
+        .cta-button { background: var(--primary); color: white; font-size: 1.3rem; font-weight: bold; padding: 20px 50px; border-radius: 50px; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); position: relative; z-index: 10; }
+        .cta-button:hover { transform: translateY(-3px); background: #1d4ed8; }
+        
+        @media(max-width: 768px) { 
+            .hero h1 { font-size: 2.8rem; } 
+            .compare-section { grid-template-columns: 1fr; } 
+            .bio-grid { grid-template-columns: 1fr !important; }
+        }
+        .bio-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 50px; align-items: start; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <!-- 1. HERO -->
+    <section class="hero">
+        <div class="alert-badge">🔴 ALERTA: Seu corpo está enviando sinais</div>
+        
+        <!-- HEADLINE ALTERADA AQUI -->
+        <h1>
+            VOCÊ NÃO ESTÁ VELHA.<br>
+            VOCÊ ESTÁ <span>INFLAMADA</span>.
+        </h1>
+        
+        <p style="font-size: 1.2rem; color: var(--text-light); max-width: 600px; margin-bottom: 20px;">
+            Aprenda a linguagem química do seu organismo e desligue os gatilhos da fadiga, dor e ansiedade em menos de 2 semanas.
+        </p>
+
+        <!-- AREA DE ANIMAÇÃO COM IMAGEM -->
+        <div class="body-morph-container">
+            <!-- Scanner Laser -->
+            <div class="med-scanner"></div>
+            
+            <!-- A Imagem j1.png -->
+            <img src="j1.png" alt="Corpo Humano" class="body-img" id="body-img">
+            
+            <div class="status-indicator" id="body-status">⚠️ INFLAMAÇÃO DETECTADA</div>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 10px;">⬇ role para ver a transformação ⬇</p>
+    </section>
+
+    <!-- 2. QUIZ INTERATIVO (6 ITENS) -->
+    <section class="section-pad">
+        <div class="container">
+            <div class="quiz-box">
+                <h2 class="quiz-title">Calculadora de Inflamação</h2>
+                <p style="text-align: center; margin-bottom: 20px; color: var(--text-light);">Marque o que você sentiu nos últimos 7 dias:</p>
+                <div class="symptom-list">
+                    <!-- Linha 1 -->
+                    <input type="checkbox" id="sym1" class="symptom-check" onchange="updateRisk()"><label for="sym1" class="symptom-label"><span>😴 Acorda Cansada</span><span class="check-icon">⬜</span></label>
+                    <input type="checkbox" id="sym2" class="symptom-check" onchange="updateRisk()"><label for="sym2" class="symptom-label"><span>🍩 Desejo por Açúcar</span><span class="check-icon">⬜</span></label>
+                    <input type="checkbox" id="sym3" class="symptom-check" onchange="updateRisk()"><label for="sym3" class="symptom-label"><span>🎈 Barriga Inchada</span><span class="check-icon">⬜</span></label>
+                    
+                    <!-- Linha 2 -->
+                    <input type="checkbox" id="sym4" class="symptom-check" onchange="updateRisk()"><label for="sym4" class="symptom-label"><span>🤯 Dor de Cabeça</span><span class="check-icon">⬜</span></label>
+                    <input type="checkbox" id="sym5" class="symptom-check" onchange="updateRisk()"><label for="sym5" class="symptom-label"><span>💅 Unhas Fracas</span><span class="check-icon">⬜</span></label>
+                    <input type="checkbox" id="sym6" class="symptom-check" onchange="updateRisk()"><label for="sym6" class="symptom-label"><span>😡 Irritabilidade</span><span class="check-icon">⬜</span></label>
+                </div>
+                <div class="risk-container"><div class="risk-fill" id="risk-bar"></div></div>
+                <div class="risk-text" id="risk-label">Nível de Inflamação: BAIXO</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. COMPARATIVO -->
+    <section class="section-pad">
+        <div class="container">
+            <h2 style="text-align: center;">QUAL CAMINHO VOCÊ VAI SEGUIR?</h2>
+            <div class="compare-section">
+                <div class="compare-col col-bad">
+                    <h3 style="margin-bottom: 20px;">🚫 Ciclo da Doença</h3>
+                    <ul class="compare-list">
+                        <li>💊 Remédio para acordar e dormir</li>
+                        <li>😣 Dietas restritivas que falham</li>
+                        <li>🩺 Exames "normais" mas sentindo dor</li>
+                        <li>📉 Envelhecimento precoce</li>
+                    </ul>
+                </div>
+                <div class="compare-col col-good">
+                    <h3 style="margin-bottom: 20px;">✅ Ciclo da Vitalidade</h3>
+                    <ul class="compare-list">
+                        <li>⚡ Energia estável o dia todo</li>
+                        <li>🥗 Comer com prazer, sem culpa</li>
+                        <li>🧠 Mente afiada e produtiva</li>
+                        <li>✨ Pele e intestino saudáveis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. DEPOIMENTOS & BIO -->
+    <section class="section-pad" style="background: white;">
+        <div class="container bio-grid">
+            <!-- Coluna da Esquerda: Depoimentos -->
+            <div>
+                <h2 style="margin-bottom: 30px;">ELAS ESCUTARAM O CORPO:</h2>
+                <audio id="audio1" src="audio1.mp3"></audio>
+                <audio id="audio2" src="audio2.mp3"></audio>
+                <div class="audio-card" id="card-audio1">
+                    <div class="play-btn" onclick="togglePlay('audio1', this, 'card-audio1')">▶</div>
+                    <div><div style="font-weight: bold;">Fernanda T.</div><div style="font-size: 0.8rem; color: #888;">Audio • 0:42</div></div><div class="waveform"></div>
+                </div>
+                <div class="audio-card" id="card-audio2">
+                    <div class="play-btn" onclick="togglePlay('audio2', this, 'card-audio2')">▶</div>
+                    <div><div style="font-weight: bold;">Juliana M.</div><div style="font-size: 0.8rem; color: #888;">Audio • 1:15</div></div><div class="waveform"></div>
+                </div>
+                <p style="font-style: italic; color: #666; margin-top: 20px;">"Foi como tirar um véu dos meus olhos. Nunca me senti tão viva."</p>
+            </div>
+
+            <!-- Coluna da Direita: Bio Fernanda -->
+            <div>
+                <!-- FOTO CORRIGIDA (Não Corta) -->
+                <img src="fernanda.png" alt="Fernanda Moreno" style="width: 100%; max-width: 350px; height: auto; border-radius: 20px; margin-bottom: 20px; display: block; object-fit: contain;">
+                
+                <h3 style="margin-bottom: 15px; font-size: 1.8rem; color: var(--text);">FERNANDA MORENO</h3>
+                <div style="font-family: 'DM Sans', sans-serif;">
+                    <p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 15px;">Fernanda Moreno é pesquisadora de saúde natural, alimentação consciente e longevidade, com quase uma década de estudo e prática...</p>
+                    <p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 15px;">Durante anos, Fernanda acreditou que viver com enxaqueca, rinite, intestino preso e falta de energia era “normal”...</p>
+                    <p style="color: #475569; font-size: 0.95rem; line-height: 1.6;">Desde então, ela se tornou referência em um novo olhar sobre saúde, mais simples, mais verdadeiro e muito mais poderoso. Criadora do projeto <b>O Corpo Sabe</b>...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. OFERTA -->
+    <section class="section-pad">
+        <div class="container">
+            <div class="offer-card">
+                <div class="pulse-ring"></div>
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px;">GUIA COMPLETO: O CORPO SABE</h2>
+                <p style="margin-bottom: 30px; font-size: 1.2rem;">Protocolo de 14 dias para desinflamação total.</p>
+                <div style="margin-bottom: 40px;">
+                    <span style="font-size: 1.5rem; color: #94a3b8; text-decoration: line-through;">R$ 197,00</span>
+                    <div class="price" style="font-size: 4rem; color: var(--primary); font-weight: 700; line-height: 1;">R$ 27,90</div>
+                    <span style="background: #bfdbfe; color: #1e3a8a; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 0.8rem;">OFERTA LIMITADA</span>
+                </div>
+                <a href="#" class="cta-button">QUERO COMEÇAR AGORA</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // --- AUDIO ---
+        function togglePlay(audioId, btnElement, cardId) {
+            const audio = document.getElementById(audioId);
+            const card = document.getElementById(cardId);
+            document.querySelectorAll('audio').forEach(a => {
+                if(a.id !== audioId) { a.pause(); a.currentTime = 0; 
+                document.querySelector(`[onclick*="${a.id}"]`).innerHTML = "▶"; 
+                document.getElementById(`card-${a.id}`).classList.remove('playing'); }
+            });
+            if (audio.paused) { audio.play(); btnElement.innerHTML = "❚❚"; card.classList.add('playing'); } 
+            else { audio.pause(); btnElement.innerHTML = "▶"; card.classList.remove('playing'); }
+            audio.onended = function() { btnElement.innerHTML = "▶"; card.classList.remove('playing'); };
+        }
+
+        // --- QUIZ (ATUALIZADO PARA 6 ITENS) ---
+        function updateRisk() {
+            const checks = document.querySelectorAll('.symptom-check:checked');
+            const count = checks.length;
+            const percentage = (count / 6) * 100;
+            const fill = document.getElementById('risk-bar');
+            const label = document.getElementById('risk-label');
+            fill.style.width = percentage + '%';
+            if(count === 0) { label.innerHTML = "Nível de Inflamação: BAIXO"; label.style.color = "var(--text)"; }
+            else if (count <= 2) { label.innerHTML = "Nível de Inflamação: MODERADO ⚠️"; label.style.color = "#d97706"; }
+            else { label.innerHTML = "Nível de Inflamação: CRÍTICO 🚨"; label.style.color = "var(--danger)"; }
+            document.querySelectorAll('.symptom-label').forEach(lbl => {
+                const checkbox = document.getElementById(lbl.getAttribute('for'));
+                lbl.querySelector('.check-icon').innerHTML = checkbox.checked ? "✅" : "⬜";
+            });
+        }
+
+        // --- ANIMAÇÃO AUTOMÁTICA (TIMER) ---
+        // Espera a página carregar
+        window.addEventListener('load', () => {
+            const bodyImg = document.getElementById('body-img');
+            const label = document.getElementById('body-status');
+
+            // 2.5 segundos = tempo que o scanner leva para descer
+            setTimeout(() => {
+                // 1. Aplicar Cura (remove filtros vermelhos)
+                bodyImg.classList.add('healed');
+
+                // 2. Mudar Texto
+                label.innerHTML = "SCAN COMPLETE: SISTEMA OTIMIZADO";
+                label.style.color = "var(--medical-blue)";
+            }, 2500); 
+        });
+    </script>
+</body>
+</html>

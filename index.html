@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Saúde Oculta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --white: #ffffff;
+            --primary: #2563eb;
+            --danger: #ef4444;
+            --dark: #0f172a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--dark);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* --- HEADER --- */
+        .progress-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 6px;
+            background: #e2e8f0;
+        }
+        
+        .progress-bar {
+            height: 100%; width: 10%;
+            background: var(--primary);
+            transition: width 0.4s ease;
+        }
+
+        /* --- SCREENS --- */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 { font-family: 'Space Grotesk', sans-serif; line-height: 1.2; margin-bottom: 20px; }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 30px;
+        }
+
+        .sub-text {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        /* --- BUTTONS --- */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+            transform: translateX(5px);
+        }
+
+        .option-btn.danger-hover:hover {
+            border-color: var(--danger);
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        /* --- ANALYSIS SCREEN --- */
+        .analyzing-loader {
+            width: 80px; height: 80px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--danger);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        .alert-text {
+            color: var(--danger);
+            font-weight: bold;
+            font-family: monospace;
+            margin-top: 10px;
+            min-height: 24px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- RESULT SCREEN (SCARY) --- */
+        .result-box {
+            border: 2px solid var(--danger);
+            background: #fef2f2;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .final-cta {
+            background: var(--danger);
+            color: white;
+            padding: 20px;
+            width: 100%;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            animation: pulseBtn 2s infinite;
+            text-decoration: none;
+            display: block;
+        }
+
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Responsividade */
+        @media(max-width: 480px) {
+            .container { height: 100vh; border-radius: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="progress-container"><div class="progress-bar" id="p-bar"></div></div>
+
+        <!-- SCREEN 0: INTRO -->
+        <div class="screen active" id="screen-0">
+            <h1 style="font-size: 2rem;">Seu corpo está tentando te avisar.</h1>
+            <p class="sub-text">Faça este rastreamento rápido para identificar se seus sintomas são sinais de algo mais grave.</p>
+            <div style="background: #fff7ed; border: 1px solid #fdba74; padding: 15px; border-radius: 8px; margin-bottom: 30px; font-size: 0.9rem; color: #c2410c;">
+                ⚠️ 87% das mulheres ignoram esses sinais até que se tornem doenças crônicas.
+            </div>
+            <button class="option-btn" style="width: 100%; justify-content: center; background: var(--dark); color: white; border: none;" onclick="nextScreen(1)">
+                COMEÇAR DIAGNÓSTICO
+            </button>
+        </div>
+
+        <!-- SCREEN 1: SINTOMA PRINCIPAL -->
+        <div class="screen" id="screen-1">
+            <h2 class="question-text">O que mais te incomoda hoje?</h2>
+            <div class="options-grid">
+                <button class="option-btn" onclick="nextScreen(2)">Cansaço extremo / Fadiga <span>😫</span></button>
+                <button class="option-btn" onclick="nextScreen(2)">Barriga inchada / Gases <span>🎈</span></button>
+                <button class="option-btn" onclick="nextScreen(2)">Ansiedade / Insônia <span>🧠</span></button>
+                <button class="option-btn" onclick="nextScreen(2)">Dificuldade de emagrecer <span>⚖️</span></button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: FREQUÊNCIA (Agravando) -->
+        <div class="screen" id="screen-2">
+            <h2 class="question-text">Com que frequência você sente isso?</h2>
+            <div class="options-grid">
+                <button class="option-btn" onclick="nextScreen(3)">Raramente</button>
+                <button class="option-btn" onclick="nextScreen(3)">Algumas vezes na semana</button>
+                <button class="option-btn danger-hover" onclick="nextScreen(3)">Quase todos os dias</button>
+                <button class="option-btn danger-hover" onclick="nextScreen(3)">Acordo e durmo assim (Crônico)</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: ROTINA (Torcendo a faca) -->
+        <div class="screen" id="screen-3">
+            <h2 class="question-text">Ao acordar pela manhã, como você se sente?</h2>
+            <div class="options-grid">
+                <button class="option-btn" onclick="nextScreen(4)">Renovada e pronta pro dia</button>
+                <button class="option-btn danger-hover" onclick="nextScreen(4)">Cansada, preciso de café urgente</button>
+                <button class="option-btn danger-hover" onclick="nextScreen(4)">Parece que um caminhão passou por cima</button>
+                <button class="option-btn danger-hover" onclick="nextScreen(4)">Sem vontade de sair da cama</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: MEDO (Implantação de Doença) -->
+        <div class="screen" id="screen-4">
+            <h2 class="question-text">Você tem medo de que esses sintomas se tornem uma doença autoimune ou algo pior no futuro?</h2>
+            <p class="sub-text" style="color: var(--danger);">Histórico familiar de diabetes, tireoide ou câncer aumentam o risco.</p>
+            <div class="options-grid">
+                <button class="option-btn danger-hover" onclick="startAnalysis()">Sim, tenho muito medo</button>
+                <button class="option-btn danger-hover" onclick="startAnalysis()">Às vezes penso nisso</button>
+                <button class="option-btn" onclick="startAnalysis()">Não, acho que é só estresse</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: ANÁLISE (Tensão) -->
+        <div class="screen" id="screen-loading">
+            <div class="analyzing-loader"></div>
+            <h2>Processando seus dados...</h2>
+            <div class="alert-text" id="alert-msg">Verificando marcadores inflamatórios...</div>
+        </div>
+
+        <!-- SCREEN 6: RESULTADO (Urgência) -->
+        <div class="screen" id="screen-result">
+            <div class="result-box">
+                <h3 style="color: var(--danger); margin-bottom: 10px;">🔴 ALERTA: NÍVEL CRÍTICO DETECTADO</h3>
+                <p style="font-size: 1rem; text-align: left; line-height: 1.5; color: #7f1d1d;">
+                    Seus sintomas indicam um quadro avançado de <b>Inflamação Sistêmica Silenciosa</b>.
+                    <br><br>
+                    Isso não é apenas "cansaço". É o seu corpo entrando em colapso tóxico. Se não tratado, esse estado é a porta de entrada para doenças autoimunes graves.
+                </p>
+            </div>
+            
+            <p style="margin-bottom: 20px; font-weight: bold;">Existe uma maneira de reverter isso antes que seja tarde demais.</p>
+
+            <!-- LINK PARA A LP FERNANDA AQUI -->
+            <a href="pagina-final.html" class="final-cta">
+                VER MEU PROTOCOLO DE SALVAÇÃO
+            </a>
+            
+            <p style="font-size: 0.8rem; margin-top: 15px; color: #999;">O vídeo na próxima página explica exatamente o que fazer.</p>
+        </div>
+
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const totalSteps = 5; // Intro + 4 Questions
+
+        function nextScreen(step) {
+            // Hide current
+            document.querySelector('.screen.active').classList.remove('active');
+            
+            // Show next
+            document.getElementById('screen-' + step).classList.add('active');
+            
+            // Update Bar
+            let percent = (step / totalSteps) * 100;
+            document.getElementById('p-bar').style.width = percent + '%';
+            
+            // Turn bar red at the end
+            if(step >= 3) {
+                document.getElementById('p-bar').style.background = 'var(--danger)';
+            }
+        }
+
+        function startAnalysis() {
+            nextScreen('loading'); // Show loading screen
+            document.getElementById('p-bar').style.width = '100%';
+            
+            const messages = [
+                "Analisando padrões de sono...",
+                "Verificando toxicidade hepática...",
+                "Calculando risco autoimune...",
+                "⚠️ SINAIS DE ALERTA ENCONTRADOS ⚠️"
+            ];
+
+            let i = 0;
+            const msgDiv = document.getElementById('alert-msg');
+            
+            // Loop through scary messages
+            const interval = setInterval(() => {
+                msgDiv.innerText = messages[i];
+                i++;
+                if (i >= messages.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showResult();
+                    }, 1500);
+                }
+            }, 1200);
+        }
+
+        function showResult() {
+            document.querySelector('.screen.active').classList.remove('active');
+            document.getElementById('screen-result').classList.add('active');
+        }
+    </script>
+</body>
+</html>
